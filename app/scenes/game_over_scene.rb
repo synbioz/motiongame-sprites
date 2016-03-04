@@ -4,7 +4,6 @@ class GameOverScene < MG::Scene
     @name = name
     game_over_label
     score(score)
-
     retry_button(name)
     new_button
   end

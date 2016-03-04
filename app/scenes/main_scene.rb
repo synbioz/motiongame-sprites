@@ -8,7 +8,6 @@ class MainScene < MG::Scene
     @hero_path = "characters/#{ name.downcase }"
 
     add_scene
-
     add_survivor(name.downcase)
     add_zombie
 
@@ -80,7 +79,7 @@ class MainScene < MG::Scene
 
   def add_wall_effect
     sprite = MG::Sprite.new("sprites/wall.png")
-    coordinates = axis_bounds(sprite, "width")
+    coordinates = coordinate_bounds(sprite, "width")
 
     coordinates.each do |coordinate|
       wall = MG::Sprite.new("sprites/wall.png")
@@ -102,7 +101,7 @@ class MainScene < MG::Scene
 
   def add_horizontal_walls
     sprite = MG::Sprite.new("sprites/top-wall-x.png")
-    coordinates = axis_bounds(sprite, "width")
+    coordinates = coordinate_bounds(sprite, "width")
 
     coordinates.each do |coordinate|
       wall = MG::Sprite.new("sprites/top-wall-x.png")
@@ -118,7 +117,7 @@ class MainScene < MG::Scene
 
   def add_vertical_walls
     sprite = MG::Sprite.new("sprites/top-wall-y.png")
-    coordinates = axis_bounds(sprite, "height")
+    coordinates = coordinate_bounds(sprite, "height")
 
     coordinates.each do |coordinate|
       wall = MG::Sprite.new("sprites/top-wall-y.png")
@@ -133,25 +132,25 @@ class MainScene < MG::Scene
   end
 
   def add_corners
-    tl_corner = MG::Sprite.new("sprites/corner-tl.png")
-    tr_corner = MG::Sprite.new("sprites/corner-tr.png")
-    bl_corner = MG::Sprite.new("sprites/corner-bl.png")
-    br_corner = MG::Sprite.new("sprites/corner-br.png")
+    top_left = MG::Sprite.new("sprites/corner-tl.png")
+    top_right = MG::Sprite.new("sprites/corner-tr.png")
+    bottom_left = MG::Sprite.new("sprites/corner-bl.png")
+    bottom_right = MG::Sprite.new("sprites/corner-br.png")
 
-    [tl_corner, tr_corner, bl_corner, br_corner].each do |corner|
+    [top_left, top_right, bottom_left, bottom_right].each do |corner|
       corner.attach_physics_box
       corner.dynamic = false
     end
 
-    tl_corner.anchor_point, tl_corner.position = [0, 1], [0, scene_size[:height]]
-    bl_corner.anchor_point, bl_corner.position = [0, 0], [0, 0]
-    tr_corner.anchor_point, tr_corner.position = [1, 1], [scene_size[:width], scene_size[:height]]
-    br_corner.anchor_point, br_corner.position = [1, 0], [scene_size[:width], 0]
+    top_left.anchor_point, top_left.position = [0, 1], [0, scene_size[:height]]
+    bottom_left.anchor_point, bottom_left.position = [0, 0], [0, 0]
+    top_right.anchor_point, top_right.position = [1, 1], [scene_size[:width], scene_size[:height]]
+    bottom_right.anchor_point, bottom_right.position = [1, 0], [scene_size[:width], 0]
 
-    add tl_corner
-    add tr_corner
-    add bl_corner
-    add br_corner
+    add top_left
+    add top_right
+    add bottom_left
+    add bottom_right
   end
 
   ############
@@ -192,31 +191,29 @@ class MainScene < MG::Scene
     end
   end
 
-  def axis_bounds(sprite, axis)
-    val = axis
-    current_size = scene_size[axis.to_sym]
-    axis_sprites = (current_size / sprite.size.method(axis).call).to_i
-    switch_position = val == "width" ? scene_size[:height] : scene_size[:width]
+  def define_frames(path)
+    [1, 2].map { |i| "#{ path }-#{ i }.png" }
+  end
+
+  def coordinate_bounds(sprite, axis)
+    axis_sprites = (scene_size[axis.to_sym] / sprite.size.method(axis).call).to_i
+    reverse_size = axis == "width" ? scene_size[:height] : scene_size[:width]
 
     coordinates = []
 
     2.times do |bound|
-      bound_coordinate = bound == 0 ? bound : switch_position
+      bound_coordinate = bound == 0 ? bound : reverse_size
 
-      axis_sprites.times do |axis|
-        coordinates << if val == "width"
-          [axis * sprite.size.width, bound_coordinate]
+      axis_sprites.times do |axis_sprite|
+        coordinates << if axis == "width"
+          [axis_sprite * sprite.size.width, bound_coordinate]
         else
-          [bound_coordinate, axis * sprite.size.height]
+          [bound_coordinate, axis_sprite * sprite.size.height]
         end
       end
     end
 
     coordinates
-  end
-
-  def define_frames(path)
-    [1, 2].map { |i| "#{ path }-#{ i }.png" }
   end
 
   def screen_coordinates(sprite)
