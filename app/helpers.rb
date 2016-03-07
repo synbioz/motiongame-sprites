@@ -1,6 +1,6 @@
 module Helpers
 
-  # @return [Object] screen sizes (width and height)
+  # @return [Hash] screen sizes (width and height)
   def scene_size
     {
       width: MG::Director.shared.size.width,
@@ -8,7 +8,7 @@ module Helpers
     }
   end
 
-  # @return [Object] coordinates of screen center
+  # @return [Hash] coordinates of screen center
   # on axis x and y
   def scene_center
     {
@@ -17,7 +17,7 @@ module Helpers
     }
   end
 
-  # @return [Object] with random screen position
+  # @return [Hash] with random screen position
   # on axis x and y
   def random_position
     {

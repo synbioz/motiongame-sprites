@@ -12,7 +12,7 @@ class MainScene < MG::Scene
     add_zombie
 
     on_touch_begin do |touch|
-      animate_survivor(direction(touch))
+      animate_character(direction(touch))
       @survivor.move_to(direction(touch), 2)
     end
 
@@ -77,6 +77,7 @@ class MainScene < MG::Scene
     add carpet
   end
 
+  # Add optique effect
   def add_wall_effect
     sprite = MG::Sprite.new("sprites/wall.png")
     coordinates = coordinate_bounds(sprite, "width")
@@ -99,6 +100,7 @@ class MainScene < MG::Scene
     add wall
   end
 
+  # Add horizontal edges walls
   def add_horizontal_walls
     sprite = MG::Sprite.new("sprites/top-wall-x.png")
     coordinates = coordinate_bounds(sprite, "width")
@@ -115,6 +117,7 @@ class MainScene < MG::Scene
     end
   end
 
+  # Add vertical edges walls
   def add_vertical_walls
     sprite = MG::Sprite.new("sprites/top-wall-y.png")
     coordinates = coordinate_bounds(sprite, "height")
@@ -131,6 +134,7 @@ class MainScene < MG::Scene
     end
   end
 
+  # Add wall corners
   def add_corners
     top_left = MG::Sprite.new("sprites/corner-tl.png")
     top_right = MG::Sprite.new("sprites/corner-tr.png")
@@ -157,6 +161,10 @@ class MainScene < MG::Scene
   # Methods
   ############
 
+  # Define the direction to move
+  #
+  # @param [Object] current location of touch event
+  # @return [Array] with coordinates to move
   def direction(touch)
     distance_x = (touch.location.x - @survivor.position.x).abs
     distance_y = (touch.location.y - @survivor.position.y).abs
@@ -168,7 +176,10 @@ class MainScene < MG::Scene
     end
   end
 
-  def animate_survivor(direction)
+  # Animate character depends on direction
+  #
+  # @param [Array] with coordinates to move
+  def animate_character(direction)
     img_y = image_direction(direction, "y")
     img_x = image_direction(direction, "x")
 
@@ -181,6 +192,12 @@ class MainScene < MG::Scene
     @survivor.animate(frames, 0.2, 2)
   end
 
+  # Define the sprite on axis
+  #
+  # @param [Array] direction with coordinates to move
+  # @param [String] axis x or y
+  # @return [String] used to keep image with convention
+  # [name-image_direction.png]
   def image_direction(direction, axis)
     if axis == "y"
       (direction[1] - @survivor.position.y) < 0 ? "face" : "back"
@@ -191,10 +208,17 @@ class MainScene < MG::Scene
     end
   end
 
+  # @param [String] path without number and file type
+  # @return [Array] paths with number and file type
   def define_frames(path)
     [1, 2].map { |i| "#{ path }-#{ i }.png" }
   end
 
+  # Apply sprite on x or y edges
+  #
+  # @param [Object] sprite
+  # @param [String] width or height
+  # @return [Array] with sprite coordinates
   def coordinate_bounds(sprite, axis)
     axis_sprites = (scene_size[axis.to_sym] / sprite.size.method(axis).call).to_i
     reverse_size = axis == "width" ? scene_size[:height] : scene_size[:width]
@@ -216,6 +240,10 @@ class MainScene < MG::Scene
     coordinates
   end
 
+  # Apply sprite on all screen
+  #
+  # @param [Object] sprite
+  # @return [Array] coordinates to cover all screen
   def screen_coordinates(sprite)
     x_sprites = (scene_size[:width] / sprite.size.width).to_i + 1
     y_sprites = (scene_size[:height] / sprite.size.height).to_i + 1
@@ -231,8 +259,8 @@ class MainScene < MG::Scene
     coordinates
   end
 
+  # Update loop every delta
   def update(delta)
-
     @time += delta
     @zombie_update_position += delta
 
